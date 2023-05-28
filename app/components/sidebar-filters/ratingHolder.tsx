@@ -30,11 +30,41 @@ const RatingHolder = ({ rating }: { rating: number }) => {
   const itemsNumber = getItemsNumberByRating(rating, dummyData);
 
   const handlClick = () => {
-    const filtredData = dummyData.filter((item) => item.rating == "" + rating);
+    //
+
+    const filtredData = state.currentData.filter(
+      (item) => item.rating == "" + rating
+    );
+
     dispatch({
-      type: actionType.SET_CURRENT_DATA,
-      payload: sortFiltersData(filtredData, state.sortingOrder),
+      type: actionType.SET_FILTERS_STATE,
+      payload: { ratingSelected: rating },
     });
+
+    if (filtredData.length != 0) {
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
+      });
+    } else {
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: dummyData.filter(
+          (item) =>
+            (item.reviewHeading
+              .toLowerCase()
+              .includes(state.searchKey.toLowerCase()) ||
+              item.reviewText
+                .toLowerCase()
+                .includes(state.searchKey.toLowerCase())) &&
+            rating + "" == item.rating &&
+            state.versionSelected != null &&
+            state.versionSelected == item.version &&
+            state.countrySelected != null &&
+            state.countrySelected == item.countryName
+        ),
+      });
+    }
   };
 
   return (

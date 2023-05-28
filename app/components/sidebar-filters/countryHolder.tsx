@@ -10,13 +10,39 @@ const CountryHolder = ({ countryName }: { countryName: string }) => {
   const { state, dispatch } = useStateValue();
 
   const handelClick = () => {
-    const filtredData = dummyData.filter(
+    const filtredData = state.currentData.filter(
       (item) => item.countryName === countryName
     );
+
     dispatch({
-      type: actionType.SET_CURRENT_DATA,
-      payload: sortFiltersData(filtredData, state.sortingOrder),
+      type: actionType.SET_FILTERS_STATE,
+      payload: { countrySelected: countryName },
     });
+
+    if (filtredData.length != 0) {
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
+      });
+    } else {
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: dummyData.filter(
+          (item) =>
+            (item.reviewHeading
+              .toLowerCase()
+              .includes(state.searchKey.toLowerCase()) ||
+              item.reviewText
+                .toLowerCase()
+                .includes(state.searchKey.toLowerCase())) &&
+            countryName == item.countryName &&
+            state.versionSelected != null &&
+            state.versionSelected == item.version &&
+            state.ratingSelected != null &&
+            state.ratingSelected + "" == item.rating
+        ),
+      });
+    }
   };
 
   return (

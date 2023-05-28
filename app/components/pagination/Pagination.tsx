@@ -19,7 +19,7 @@ export const Pagination = () => {
 
   const pagesHolder = state.currentData.slice(
     displayedPages - 10,
-    displayedPages
+    displayedPages < pagesNumber ? displayedPages : pagesNumber
   );
 
   console.log(pagesNumber + "-------", displayedPages);
@@ -34,7 +34,7 @@ export const Pagination = () => {
 
   //
   const handelNext = (): void => {
-    if (pagesNumber - displayedPages > 10) {
+    if (pagesNumber - displayedPages >= 10) {
       setDisplaydPages((prevState) => prevState + 10);
     } else if (
       0 < pagesNumber - displayedPages &&
@@ -44,7 +44,7 @@ export const Pagination = () => {
     }
   };
   const handelPreviuos = (): void => {
-    if (displayedPages - 10 > 10) {
+    if (displayedPages - 10 >= 10) {
       setDisplaydPages((prevState) => prevState - 10);
     } else if (displayedPages - 10 > 0) {
       setDisplaydPages((prevState) => prevState - (displayedPages - 10));
