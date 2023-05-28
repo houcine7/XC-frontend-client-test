@@ -3,13 +3,18 @@
 import { useState } from "react";
 import { IoMdArrowDropdown, IoMdArrowDropright } from "react-icons/io";
 
-const SideBarFilter = ({
-  name,
-  Child,
-}: {
-  name: string;
-  Child: JSX.Element;
-}) => {
+// function to sort data after filtering by sortinOrder state
+export const sortFiltersData = (data: any, sortingOrder: string) => {
+  return data.sort((item1: any, item2: any) => {
+    const a = new Date(item1.reviewDate);
+    const b = new Date(item2.reviewDate);
+    return sortingOrder == "newestFirst"
+      ? b.getTime() - a.getTime()
+      : a.getTime() - b.getTime();
+  });
+};
+//
+const SideBarFilter = ({ name, Childs }: { name: string; Childs: any }) => {
   const [showItems, setShowItems] = useState(true);
 
   return (
@@ -30,12 +35,7 @@ const SideBarFilter = ({
 
       {showItems && (
         <div className="child-component transition-all duration-300 ease-in-out">
-          {Child}
-          {Child}
-          {Child}
-          {Child}
-          {Child}
-          {Child}
+          {Childs}
         </div>
       )}
     </div>

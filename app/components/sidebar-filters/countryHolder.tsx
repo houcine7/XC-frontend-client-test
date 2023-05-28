@@ -1,19 +1,33 @@
-import Image from "next/image";
+"use client";
 
-const CountryHolder = () => {
+import { useStateValue } from "@/app/context/contextProvider";
+import CountryFlag from "../country-flag/CountryFlag";
+import { dummyData } from "@/app/data/data";
+import { actionType } from "@/app/context/reducer";
+import { sortFiltersData } from "./sideBarFilter";
+
+const CountryHolder = ({ countryName }: { countryName: string }) => {
+  const { state, dispatch } = useStateValue();
+
+  const handelClick = () => {
+    const filtredData = dummyData.filter(
+      (item) => item.countryName === countryName
+    );
+    dispatch({
+      type: actionType.SET_CURRENT_DATA,
+      payload: sortFiltersData(filtredData, state.sortingOrder),
+    });
+  };
+
   return (
     <div className="flex justify-between items-center">
-      <div className="flex gap-2 items-center">
-        <Image
-          src={"/uk-img.png"}
-          alt="country flag"
-          className="rounded"
-          width={28}
-          height={17}
-          style={{ height: 17 }}
-        />
+      <div
+        className="flex gap-2 items-center cursor-pointer"
+        onClick={handelClick}
+      >
+        <CountryFlag countryName={countryName} />
         {/* <img src="/uk-img.png" alt="country flag" className="w-4 h-3 rounded" /> */}
-        <p>United kingdom</p>
+        <p>{countryName}</p>
       </div>
       <div>
         <p className="font-light text-sm text-gray-400">44</p>

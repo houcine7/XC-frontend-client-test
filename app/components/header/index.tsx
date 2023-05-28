@@ -16,7 +16,10 @@ const Header = () => {
       <div className="flex gap-4">
         <FilterRightInput
           name="Sorting"
-          options={[{ name: "Newest first", value: "date" }]}
+          options={[
+            { name: "Newest First", value: "newestFirst" },
+            { name: "Oldest first", value: "oldestFirst" },
+          ]}
         />
         <FilterRightInput
           name="Translation"

@@ -1,4 +1,5 @@
 import Header from "./components/header";
+import { StateProvider } from "./context/contextProvider";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header />
-        {children}
+        <StateProvider>
+          <Header />
+          {children}
+        </StateProvider>
       </body>
     </html>
   );
