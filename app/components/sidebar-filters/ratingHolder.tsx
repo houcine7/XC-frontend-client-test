@@ -27,7 +27,7 @@ const RatingHolder = ({ rating }: { rating: number }) => {
   const { state, dispatch } = useStateValue();
 
   const dummyArray = [1, 2, 3, 4, 5];
-  const itemsNumber = getItemsNumberByRating(rating, dummyData);
+  const itemsNumber = getItemsNumberByRating(rating, state.currentData);
 
   const handlClick = () => {
     //
@@ -47,22 +47,45 @@ const RatingHolder = ({ rating }: { rating: number }) => {
         payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     } else {
-      dispatch({
-        type: actionType.SET_CURRENT_DATA,
-        payload: dummyData.filter(
-          (item) =>
+      const filtredData = dummyData.filter((item) => {
+        if (state.searchKey != "") {
+          return (
             (item.reviewHeading
               .toLowerCase()
               .includes(state.searchKey.toLowerCase()) ||
-              item.reviewText
+              (item.reviewText
                 .toLowerCase()
-                .includes(state.searchKey.toLowerCase())) &&
-            rating + "" == item.rating &&
-            state.versionSelected != null &&
-            state.versionSelected == item.version &&
-            state.countrySelected != null &&
-            state.countrySelected == item.countryName
-        ),
+                .includes(state.searchKey.toLowerCase()) &&
+                (state.versionSelected != null
+                  ? state.versionSelected == item.version
+                  : true))) &&
+            (state.countrySelected != null
+              ? state.countrySelected + "" == item.countryName
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            rating + "" == item.rating
+          );
+        } else {
+          return (
+            (state.versionSelected != null
+              ? state.versionSelected == item.version
+              : true) &&
+            (state.countrySelected != null
+              ? state.countrySelected + "" == item.countryName
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            rating + "" == item.rating
+          );
+        }
+      });
+
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     }
   };

@@ -1,3 +1,5 @@
+"use client";
+
 import { IoMdArrowDropdown } from "react-icons/io";
 
 import { IoNotificationsSharp } from "react-icons/io5";
@@ -5,12 +7,32 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import { BiWifi, BiCodeCurly } from "react-icons/bi";
 
 import { ImDownload3 } from "react-icons/im";
+import { useStateValue } from "@/app/context/contextProvider";
 
 const MainRigthHeader = () => {
+  const { state, dispatch } = useStateValue();
+
+  const startCounter = state.currentPage * 10 + 1;
+
+  console.log(state.currentPage);
+
+  const endCounter =
+    state.currentData.length >= 10 * (state.currentPage + 1)
+      ? (state.currentPage + 1) * 10
+      : state.currentData.length;
+
   return (
     <div className="flex justify-between mb-2 items-center ">
       <p className="text-sm font-semibold items-center">
-        viewing 1-10 of 155 reviews
+        {state.currentData.length > 10
+          ? "viewing" +
+            startCounter +
+            "-" +
+            endCounter +
+            " of " +
+            state.currentData.length +
+            " reviews"
+          : "viewing " + state.currentData.length + " of reviews"}
       </p>
 
       <div className="flex items-center gap-4 ">

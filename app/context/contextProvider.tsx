@@ -8,10 +8,22 @@ export type StateType = {
   currentData: any[];
   currentPage: number;
   sortingOrder: string;
+
   searchKey: string;
   ratingSelected: number | null;
   versionSelected: string | null;
   countrySelected: string | null;
+
+  dateRange: {
+    strtingDate: string | null;
+    endingDate: string | null;
+  };
+
+  currentApp: {
+    name: string;
+    color: string;
+    value: string;
+  };
 };
 
 export type ActionType = {

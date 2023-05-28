@@ -31,6 +31,15 @@ const SearchBar = () => {
           type: actionType.SET_CURRENT_DATA,
           payload: sortFiltersData(keySearchResult, state.sortingOrder),
         });
+
+        dispatch({
+          type: actionType.SET_FILTERS_STATE,
+          payload: {
+            selectedVersion: null,
+            selectedRatin: null,
+            selectedCountry: null,
+          },
+        });
       } catch (error) {
         console.log(error);
       }

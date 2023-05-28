@@ -6,6 +6,15 @@ import { dummyData } from "@/app/data/data";
 import { actionType } from "@/app/context/reducer";
 import { sortFiltersData } from "./sideBarFilter";
 
+const gettNumberItemsByCountry = (data: any, countryName: string): number => {
+  let counter = 0;
+  data.forEach((item: any) => {
+    if (item.countryName === countryName) counter++;
+  });
+
+  return counter;
+};
+
 const CountryHolder = ({ countryName }: { countryName: string }) => {
   const { state, dispatch } = useStateValue();
 
@@ -25,25 +34,53 @@ const CountryHolder = ({ countryName }: { countryName: string }) => {
         payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     } else {
-      dispatch({
-        type: actionType.SET_CURRENT_DATA,
-        payload: dummyData.filter(
-          (item) =>
+      const filtredData = dummyData.filter((item) => {
+        if (state.searchKey != "") {
+          return (
             (item.reviewHeading
               .toLowerCase()
               .includes(state.searchKey.toLowerCase()) ||
-              item.reviewText
+              (item.reviewText
                 .toLowerCase()
-                .includes(state.searchKey.toLowerCase())) &&
-            countryName == item.countryName &&
-            state.versionSelected != null &&
-            state.versionSelected == item.version &&
-            state.ratingSelected != null &&
-            state.ratingSelected + "" == item.rating
-        ),
+                .includes(state.searchKey.toLowerCase()) &&
+                (state.versionSelected != null
+                  ? state.versionSelected == item.version
+                  : true))) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == item.rating
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            countryName == item.countryName
+          );
+        } else {
+          return (
+            (state.versionSelected != null
+              ? state.versionSelected == item.version
+              : true) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == item.rating
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            countryName == item.countryName
+          );
+        }
+      });
+
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     }
   };
+
+  const counterByFlag = gettNumberItemsByCountry(
+    state.currentData,
+    countryName
+  );
 
   return (
     <div className="flex justify-between items-center">
@@ -56,7 +93,7 @@ const CountryHolder = ({ countryName }: { countryName: string }) => {
         <p>{countryName}</p>
       </div>
       <div>
-        <p className="font-light text-sm text-gray-400">44</p>
+        <p className="font-light text-sm text-gray-400">{counterByFlag}</p>
       </div>
     </div>
   );

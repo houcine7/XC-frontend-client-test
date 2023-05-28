@@ -38,27 +38,49 @@ const VersionHolder = ({ version }: propsType) => {
         payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     } else {
-      dispatch({
-        type: actionType.SET_CURRENT_DATA,
-        payload: dummyData.filter(
-          (item) =>
+      const filtredData = dummyData.filter((item) => {
+        if (state.searchKey != "") {
+          return (
             (item.reviewHeading
               .toLowerCase()
               .includes(state.searchKey.toLowerCase()) ||
-              item.reviewText
+              (item.reviewText
                 .toLowerCase()
-                .includes(state.searchKey.toLowerCase())) &&
-            version == item.version &&
-            state.ratingSelected != null &&
-            item.rating == "" + state.ratingSelected &&
-            state.countrySelected != null &&
-            state.countrySelected == item.countryName
-        ),
+                .includes(state.searchKey.toLowerCase()) &&
+                (state.countrySelected != null
+                  ? state.countrySelected == item.countryName
+                  : true))) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == item.rating
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            version == item.version
+          );
+        } else {
+          return (
+            (state.countrySelected != null
+              ? state.countrySelected == item.countryName
+              : true) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == item.rating
+              : true) &&
+            (state.currentApp.name != "My App"
+              ? state.currentApp.name == item.appID.split(".")[1]
+              : true) &&
+            version == item.version
+          );
+        }
+      });
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
       });
     }
   };
 
-  const itemNumber = getNumberItems(dummyData, version);
+  const itemNumber = getNumberItems(state.currentData, version);
   return (
     <div className="flex justify-between items-center cursor-pointer">
       <p onClick={handelClick}>{version}</p>

@@ -9,4 +9,14 @@ export const initialState: StateType = {
   ratingSelected: null,
   versionSelected: null,
   countrySelected: null,
+  dateRange: {
+    endingDate: null,
+    strtingDate: null,
+  },
+
+  currentApp: {
+    name: "My App",
+    color: "violet",
+    value: "dummy",
+  },
 };

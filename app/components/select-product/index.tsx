@@ -4,53 +4,87 @@ import React, { useState } from "react";
 
 import { SlArrowDown } from "react-icons/sl";
 import DropDownItem, { option } from "./dropDownItem";
+import { dummyData } from "@/app/data/data";
+import { useStateValue } from "@/app/context/contextProvider";
+import { actionType } from "@/app/context/reducer";
+import { sortFiltersData } from "../sidebar-filters/sideBarFilter";
 
-const INITIAL_STATE = {
-  name: "My app 2",
-  color: "violet",
-  value: "the value",
-};
+let dropDownApps: string[] = new Array();
 
-const dummyDropDownList = [
-  {
-    name: "My app 2",
-    color: "orange",
-    value: "the value1",
-  },
-  {
-    name: "My app 5",
-    color: "pink",
-    value: "the value1",
-  },
-  {
-    name: "My app 2",
-    color: "yellow",
-    value: "the value5",
-  },
-  {
-    name: "My app 4",
-    color: "green",
-    value: "the value1",
-  },
-];
+dummyData.forEach((item) => {
+  if (!dropDownApps.includes(item.appID.split(".")[1])) {
+    dropDownApps.push(item.appID.split(".")[1]);
+  }
+});
 
 const Select = () => {
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const [currentProduct, setCurrentProduct] = useState(INITIAL_STATE);
+  const { state, dispatch } = useStateValue();
 
   const handelClick = (): void => {
     setShowDropdown((prevState) => !prevState);
   };
 
-  const handelChoice = (item: option): void => {
+  const handelChoice = (option: option): void => {
     setShowDropdown(false);
 
-    setCurrentProduct({
-      name: item.name,
-      color: item.color,
-      value: item.value,
+    dispatch({
+      type: actionType.SET_CURRENT_APP,
+      payload: { name: option.name, color: option.color, value: option.value },
     });
+
+    const filtredData = state.currentData.filter(
+      (dataItem) => dataItem.appID.split(".")[1] == option.name
+    );
+
+    if (filtredData.length != 0) {
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
+      });
+    } else {
+      const filtredData = dummyData.filter((dataItem) => {
+        if (state.searchKey != "") {
+          return (
+            (dataItem.reviewHeading
+              .toLowerCase()
+              .includes(state.searchKey.toLowerCase()) ||
+              (dataItem.reviewText
+                .toLowerCase()
+                .includes(state.searchKey.toLowerCase()) &&
+                (state.versionSelected != null
+                  ? state.versionSelected == dataItem.version
+                  : true))) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == dataItem.rating
+              : true) &&
+            (state.countrySelected != null
+              ? state.countrySelected == dataItem.countryName
+              : true) &&
+            dataItem.appID.split(".")[1] == option.name
+          );
+        } else {
+          return (
+            (state.versionSelected != null
+              ? state.versionSelected == dataItem.version
+              : true) &&
+            (state.ratingSelected != null
+              ? state.ratingSelected + "" == dataItem.rating
+              : true) &&
+            (state.countrySelected != null
+              ? state.countrySelected == dataItem.countryName
+              : true) &&
+            dataItem.appID.split(".")[1] == option.name
+          );
+        }
+      });
+
+      dispatch({
+        type: actionType.SET_CURRENT_DATA,
+        payload: sortFiltersData(filtredData, state.sortingOrder),
+      });
+    }
   };
 
   return (
@@ -62,10 +96,10 @@ const Select = () => {
         <div className="flex items-center gap-4 ">
           <span
             className={`rounded w-6 h-6`}
-            style={{ backgroundColor: currentProduct.color }}
+            style={{ backgroundColor: state.currentApp.color }}
           ></span>
           <p className="text-gray-900 text-lg font-medium">
-            {currentProduct.name}
+            {state.currentApp.name}
           </p>
         </div>
         <SlArrowDown size={14} />
@@ -73,8 +107,22 @@ const Select = () => {
 
       {showDropdown && (
         <div className="z-40 absolute dropdown options border-b border-l border-r border-gray-40  w-full bg-gray-50">
-          {dummyDropDownList.map((item, index) => (
-            <DropDownItem key={index} item={item} handelChoice={handelChoice} />
+          {dropDownApps.map((dropDownItem, index) => (
+            <DropDownItem
+              key={index}
+              item={{
+                color: "blue",
+                name: dropDownItem,
+                value: dropDownItem,
+              }}
+              handelChoice={() =>
+                handelChoice({
+                  color: "#8900FF",
+                  name: dropDownItem,
+                  value: dropDownItem,
+                })
+              }
+            />
           ))}
         </div>
       )}
